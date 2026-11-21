@@ -1,0 +1,34 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: documind
+          POSTGRES_PASSWORD: documind
+          POSTGRES_DB: documind
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U documind"
+          --health-interval 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://documind:documind@localhost:5432/documind
+      EMBEDDING_BACKEND: fake
+      SIMILARITY_THRESHOLD: "0.05"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r backend/requirements.txt
+      - run: cd backend && ruff check .
+      - run: cd backend && alembic upgrade head
+      - run: cd backend && pytest --cov=app --cov-report=term-missing
