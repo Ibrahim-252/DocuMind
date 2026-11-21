@@ -1,7 +1,7 @@
 {
   "name": "documind",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  "features": { "ghcr.io/devcontainers/features/docker-in-docker:2": {} },
+  "features": { "ghcr.io/devcontainers/features/docker-in-docker:2": { "moby": false } },
   "forwardPorts": [8000, 8501, 5432],
   "postCreateCommand": "pip install -r backend/requirements.txt -r frontend/requirements.txt",
   "customizations": {
