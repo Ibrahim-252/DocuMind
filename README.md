@@ -77,9 +77,16 @@ Tests use a fast deterministic fake embedding and a fake LLM, so they need only 
 
 ## Evaluation
 
-1. Upload your test documents.
-2. Copy `eval/questions.example.csv` to `eval/questions.csv` and write 15–20 questions with the expected file and page.
-3. Run `python eval/run_eval.py`.
+A sample document and question set are included:
+
+- `eval/regulation.pdf`: a 14-page fictional university regulation (internship, exams, attendance, graduation).
+- `eval/questions.csv`: 20 questions about it, each with the file and page where the answer is.
+
+1. Start the API with the real embedding model (`EMBEDDING_BACKEND=fastembed`, the default in `.env.example`).
+2. Upload `eval/regulation.pdf` (keep the file name `regulation.pdf`) and wait until its status is `ready`.
+3. Run `python eval/run_eval.py --questions eval/questions.csv`.
+
+To evaluate your own documents, copy `eval/questions.example.csv` and write 15–20 questions with the expected file and page.
 
 | Chunk size | Similarity threshold | Correct source in top 6 |
 | --- | --- | --- |
