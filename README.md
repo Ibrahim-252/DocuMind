@@ -88,9 +88,11 @@ A sample document and question set are included:
 
 To evaluate your own documents, copy `eval/questions.example.csv` and write 15–20 questions with the expected file and page.
 
-| Chunk size | Similarity threshold | Correct source in top 6 |
-| --- | --- | --- |
-| 800 | 0.25 | _fill in_ |
+| Chunk size | Similarity threshold | Top-1 | Top-3 | Top-6 |
+| --- | --- | --- | --- | --- |
+| 800 | 0.25 | 13/20 (65%) | 19/20 (95%) | 20/20 (100%) |
+
+Top-k counts chunks, not distinct pages. The test PDF has only 14 pages, so top-6 is lenient and top-1 and top-3 are the stricter scores.
 
 ## Design decisions
 
