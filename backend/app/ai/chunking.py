@@ -35,12 +35,21 @@ def split_pages(pages: list[tuple[int, str]], size: int = 800, overlap: int = 15
 
     Each chunk is {"page": int, "index": int, "text": str}. Consecutive chunks on the
     same page share a short overlap so sentences cut at a boundary are not lost.
+
+    Pieces are kept to `size - overlap - 1` characters, so the overlap from the previous
+    chunk plus a new piece always fits within `size` and the overlap is never dropped.
     """
+    if size <= 0:
+        raise ValueError("size must be positive")
+    if overlap < 0 or overlap >= size:
+        raise ValueError("overlap must be >= 0 and smaller than size")
+
+    piece_size = max(1, size - overlap - 1)
     chunks: list[dict] = []
     index = 0
     for page_number, text in pages:
         current = ""
-        for unit in _units(text, size):
+        for unit in _units(text, piece_size):
             if not current:
                 current = unit
             elif len(current) + 1 + len(unit) <= size:
