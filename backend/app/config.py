@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     upload_dir: str = "uploads"
     max_upload_mb: int = 20
+    log_level: str = "INFO"
 
 
 settings = Settings()
