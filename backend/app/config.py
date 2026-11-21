@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://documind:documind@localhost:5432/documind"
 
+    llm_provider: str = "anthropic"  # "anthropic" or "openrouter"
     llm_api_key: str = ""
     llm_model: str = "claude-sonnet-5-5"
 
