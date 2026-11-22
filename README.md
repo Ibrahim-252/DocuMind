@@ -31,7 +31,7 @@ flowchart LR
 
 ## Tech stack
 
-Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL 16 + pgvector · fastembed (`paraphrase-multilingual-MiniLM-L12-v2`) · pypdf · Anthropic API · Streamlit · pytest · ruff · Docker · GitHub Actions · GitHub Codespaces
+Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL 16 + pgvector · fastembed (`paraphrase-multilingual-MiniLM-L12-v2`) · pypdf · Anthropic or OpenRouter API · Streamlit · pytest · ruff · Docker · GitHub Actions · GitHub Codespaces
 
 ## Quick start (GitHub Codespaces)
 
@@ -46,7 +46,7 @@ Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL 16 + pgvector ·
    docker compose up -d db
    cd backend && alembic upgrade head
    ```
-4. Run the API (terminal 1) and the UI (terminal 2):
+4. Run the API and the UI, each in its own terminal (see "Running the project" below):
    ```bash
    cd backend && uvicorn app.main:app --reload --port 8000
    cd frontend && streamlit run app.py --server.port 8501
@@ -54,6 +54,60 @@ Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL 16 + pgvector ·
 5. Open the forwarded port 8501, upload a PDF and ask a question. The interactive API docs are at `/docs` on port 8000.
 
 The first embedding run downloads the model (a few hundred MB, once).
+
+## Running the project (every time you open or restart a Codespace)
+
+After a Codespace restart the database container is stopped. If you skip this step,
+the API answers with HTTP 500 and the UI shows "Cannot reach the API" when the
+backend is not running.
+
+You need **three terminals**. The database, the backend and the frontend must all
+run at the same time, each in its own terminal.
+
+**Terminal 1: database** (project root)
+
+```bash
+docker compose up -d db
+docker compose ps        # wait until the db row says "healthy"
+```
+
+Only on a fresh database (first time, or after the volume was deleted):
+
+```bash
+cd backend && alembic upgrade head
+```
+
+**Terminal 2: backend**
+
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8000
+```
+
+**Terminal 3: frontend**
+
+```bash
+cd frontend
+streamlit run app.py --server.port 8501
+```
+
+Open port 8501 from the **Ports** tab for the app, and `/docs` on port 8000 for the
+interactive API documentation.
+
+### LLM secrets
+
+Real answers need three Codespaces secrets. Add them under
+GitHub → Settings → Codespaces → Secrets (repository: DocuMind):
+
+| Secret | Meaning |
+| --- | --- |
+| `LLM_API_KEY` | Your API key |
+| `LLM_PROVIDER` | `openrouter` |
+| `LLM_MODEL` | Model name, for example `openai/gpt-4o-mini` for OpenRouter |
+
+Restart the Codespace after adding or changing secrets. Without `LLM_API_KEY` the
+app uses a fake LLM that returns a placeholder answer. Never write keys into files
+or commits.
 
 ## API
 
