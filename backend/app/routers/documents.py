@@ -2,7 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Response, UploadFile
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -25,6 +25,15 @@ def upload_document(
     suffix = Path(original_name).suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
         raise HTTPException(status_code=400, detail="Only PDF and TXT files are accepted")
+
+    duplicate = db.scalar(
+        select(Document.id).where(func.lower(Document.filename) == original_name.lower())
+    )
+    if duplicate is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="A document with this name already exists. Rename the file or delete the old one first",
+        )
 
     limit = settings.max_upload_mb * 1024 * 1024
     data = file.file.read(limit + 1)
