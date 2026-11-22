@@ -60,10 +60,32 @@ The first embedding run downloads the model (a few hundred MB, once).
 | Method | Path | Description |
 | --- | --- | --- |
 | GET | `/health` | Health check |
-| POST | `/documents` | Upload a PDF/TXT file (`202`, processed in the background) |
+| POST | `/documents` | Upload a PDF/TXT file (`202`, processed in the background). Returns `409` if a document with the same name exists |
 | GET | `/documents` | List documents with their status |
 | DELETE | `/documents/{id}` | Delete a document and its chunks |
 | POST | `/chat` | `{"question": "..."}` → `{"answer": "...", "sources": [{filename, page, snippet}]}` |
+
+![API documentation (Swagger UI)](docs/api-docs.png)
+
+### Example requests
+
+```bash
+# Upload a document (returns 202 and status "pending")
+curl -F "file=@sample.pdf" http://localhost:8000/documents
+
+# List documents and their status (wait for "ready")
+curl http://localhost:8000/documents
+
+# Ask a question
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is the line count of the open-source GIS package?"}'
+
+# Delete a document
+curl -X DELETE http://localhost:8000/documents/1
+```
+
+Uploading a second file with the same name returns `409`. Delete the old one first.
 
 ## Tests
 
