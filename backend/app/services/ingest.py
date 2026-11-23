@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.ai.chunking import split_pages
 from app.ai.embeddings import embed_texts
 from app.ai.parsers import extract_pages
+from app.config import settings
 from app.db import SessionLocal
 from app.models import Chunk, Document
 
@@ -21,7 +22,9 @@ def ingest_document(db: Session, document_id: int) -> None:
         document.error_message = None
         db.commit()
 
-        pieces = split_pages(extract_pages(document.stored_path))
+        pieces = split_pages(
+            extract_pages(document.stored_path), size=settings.chunk_size, overlap=settings.chunk_overlap
+        )
         if not pieces:
             raise ValueError("No readable text found (scanned PDFs are not supported).")
         vectors = embed_texts([p["text"] for p in pieces])
