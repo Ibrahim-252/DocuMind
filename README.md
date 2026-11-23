@@ -156,19 +156,29 @@ Tests use a fast deterministic fake embedding and a fake LLM, so they need only 
 A sample document and question set are included:
 
 - `eval/regulation.pdf`: a 14-page fictional university regulation (internship, exams, attendance, graduation).
-- `eval/questions.csv`: 20 questions about it, each with the file and page where the answer is.
+- `eval/questions.csv`: 20 direct questions about it, each with the file and page where the answer is.
+- `eval/questions_paraphrased.csv`: 12 paraphrased questions (different wording than the document) for the same pages.
 
 1. Start the API with the real embedding model (`EMBEDDING_BACKEND=fastembed`, the default in `.env.example`).
 2. Upload `eval/regulation.pdf` (keep the file name `regulation.pdf`) and wait until its status is `ready`.
-3. Run `python eval/run_eval.py --questions eval/questions.csv`.
+3. Run `python eval/run_eval.py --questions eval/questions.csv` (and the same with `eval/questions_paraphrased.csv`).
+
+The evaluation only checks the retrieved sources, so the LLM is not needed (an empty `LLM_API_KEY` uses the fake LLM).
+Chunk size is set with `CHUNK_SIZE` and `CHUNK_OVERLAP` (default 800 and 150 characters). It is applied when a document is processed, so re-upload documents after changing it.
 
 To evaluate your own documents, copy `eval/questions.example.csv` and write 15–20 questions with the expected file and page.
 
-| Chunk size | Similarity threshold | Top-1 | Top-3 | Top-6 |
-| --- | --- | --- | --- | --- |
-| 800 | 0.25 | 13/20 (65%) | 19/20 (95%) | 20/20 (100%) |
+Results for `regulation.pdf` with similarity threshold 0.25 and overlap 150:
+
+| Chunk size | Chunks | Top-1 | Top-3 | Top-6 | Paraphrased Top-1 | Paraphrased Top-3 | Paraphrased Top-6 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | 58 | 14/20 (70%) | 19/20 (95%) | 20/20 (100%) | 5/12 (42%) | 11/12 (92%) | 12/12 (100%) |
+| **800 (default)** | 30 | 13/20 (65%) | 19/20 (95%) | 20/20 (100%) | 8/12 (67%) | 9/12 (75%) | 12/12 (100%) |
+| 1200 | 22 | 13/20 (65%) | 18/20 (90%) | 19/20 (95%) | 6/12 (50%) | 8/12 (67%) | 11/12 (92%) |
 
 Top-k counts chunks, not distinct pages. The test PDF has only 14 pages, so top-6 is lenient and top-1 and top-3 are the stricter scores.
+
+We keep 800 as the default. Smaller chunks (500) are more precise and win slightly on direct top-1, but each chunk has less context, and paraphrased top-1 drops from 67% to 42%. Bigger chunks (1200) give more context but fewer, coarser results, and score equal or worse on every measure.
 
 ## Design decisions
 
