@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     embedding_backend: str = "fastembed"  # "fastembed" or "fake"
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     similarity_threshold: float = 0.25
+    chunk_size: int = 800  # max characters per chunk
+    chunk_overlap: int = 150  # characters repeated from the previous chunk
 
     upload_dir: str = "uploads"
     max_upload_mb: int = 20
