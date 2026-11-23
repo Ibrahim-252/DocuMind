@@ -180,6 +180,16 @@ Top-k counts chunks, not distinct pages. The test PDF has only 14 pages, so top-
 
 We keep 800 as the default. Smaller chunks (500) are more precise and win slightly on direct top-1, but each chunk has less context, and paraphrased top-1 drops from 67% to 42%. Bigger chunks (1200) give more context but fewer, coarser results, and score equal or worse on every measure.
 
+### Unanswerable questions
+
+`eval/run_unanswerable.py` asks 9 questions that the regulation PDF does not answer (see `eval/unanswerable.csv`) and checks that the assistant replies "I could not find this in the uploaded documents."
+
+Result: **9 of 9 refused (100%)**. This is a small set of clearly off-topic questions, so it does not show how the system behaves on questions that are close to the document's topic.
+
+Run it with the backend running and the PDF uploaded:
+
+    python eval/run_unanswerable.py
+
 ## Design decisions
 
 - **Sync SQLAlchemy and `BackgroundTasks`:** simpler and enough for this scale. A real job queue (Redis + ARQ) is a later step.
