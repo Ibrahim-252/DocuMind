@@ -170,6 +170,16 @@ To evaluate your own documents, copy `eval/questions.example.csv` and write 15â€
 
 Top-k counts chunks, not distinct pages. The test PDF has only 14 pages, so top-6 is lenient and top-1 and top-3 are the stricter scores.
 
+### Unanswerable questions
+
+`eval/run_unanswerable.py` asks 9 questions that the regulation PDF does not answer (see `eval/unanswerable.csv`) and checks that the assistant replies "I could not find this in the uploaded documents."
+
+Result: **9 of 9 refused (100%)**. This is a small set of clearly off-topic questions, so it does not show how the system behaves on questions that are close to the document's topic.
+
+Run it with the backend running and the PDF uploaded:
+
+    python eval/run_unanswerable.py
+
 ## Design decisions
 
 - **Sync SQLAlchemy and `BackgroundTasks`:** simpler and enough for this scale. A real job queue (Redis + ARQ) is a later step.
