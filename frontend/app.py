@@ -1,5 +1,7 @@
 """Streamlit interface for DocuMind."""
 
+import re
+
 import streamlit as st
 
 import api_client as api
@@ -12,6 +14,29 @@ STATUS_BADGES = {
     "ready": ("Ready", "green"),
     "failed": ("Failed", "red"),
 }
+
+NOT_FOUND = "I could not find this in the uploaded documents."
+CITATION = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
+
+
+def is_not_found(answer: str) -> bool:
+    return answer.strip() == NOT_FOUND
+
+
+def cite_files(text: str, sources: list) -> str:
+    """Replace [n] with the file name and page of source n."""
+
+    def replace(match: re.Match) -> str:
+        labels = []
+        for number in re.findall(r"\d+", match.group(1)):
+            index = int(number)
+            if not 1 <= index <= len(sources):
+                return match.group(0)
+            source = sources[index - 1]
+            labels.append(f"{source['filename']}, page {source['page']}")
+        return "(" + "; ".join(labels) + ")"
+
+    return CITATION.sub(replace, text)
 
 st.session_state.setdefault("messages", [])
 st.session_state.setdefault("upload_picker", 0)
@@ -86,9 +111,9 @@ def show_message(role: str, content: str, sources: list | None = None) -> None:
         if role == "user":
             st.text(content)
         else:
-            st.markdown(content)
+            st.markdown(cite_files(content, sources or []))
 
-        if sources:
+        if sources and not is_not_found(content):
             with st.expander(f"Sources ({len(sources)})"):
                 for index, source in enumerate(sources, start=1):
                     st.text(f"[{index}] {source['filename']} · Page {source['page']}")
