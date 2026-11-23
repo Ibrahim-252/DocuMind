@@ -3,7 +3,7 @@
 A **RAG (retrieval-augmented generation) document assistant** built with **FastAPI**.
 Upload PDF/TXT files, then ask questions and get answers that cite the **file and page** they came from.
 
-> Live demo: _add your link here_ · Demo video: _add your link here_
+
 
 ## Features
 
