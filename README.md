@@ -178,7 +178,7 @@ Results for `regulation.pdf` with similarity threshold 0.25 and overlap 150:
 
 Top-k counts chunks, not distinct pages. The test PDF has only 14 pages, so top-6 is lenient and top-1 and top-3 are the stricter scores.
 
-We keep 800 as the default. Smaller chunks (500) are more precise and win slightly on direct top-1, but each chunk has less context, and paraphrased top-1 drops from 67% to 42%. Bigger chunks (1200) give more context but fewer, coarser results, and are worse on every score.
+We keep 800 as the default. Smaller chunks (500) are more precise and win slightly on direct top-1, but each chunk has less context, and paraphrased top-1 drops from 67% to 42%. Bigger chunks (1200) give more context but fewer, coarser results, and score equal or worse on every measure.
 
 ## Design decisions
 
